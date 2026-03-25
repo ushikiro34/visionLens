@@ -28,6 +28,9 @@ class MFDSApiClient:
         음식명으로 식약처 DB 검색
         반환: 매칭된 식품 리스트 (100g당 영양 정보 포함)
         """
+        if not self.api_key:
+            raise MFDSApiError("식약처 API 키가 설정되지 않았습니다. MFDS_API_KEY 환경변수를 확인하세요.")
+
         start = (page - 1) * page_size + 1
         end = page * page_size
         url = f"{self.base_url}/{self.api_key}/{self.service_id}/json/{start}/{end}"
