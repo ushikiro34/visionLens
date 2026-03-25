@@ -59,7 +59,7 @@ class HITLService:
             )
             db.add(record)
 
-        await db.commit()
+        await db.flush()
         return session
 
     async def apply_correction(
@@ -95,7 +95,6 @@ class HITLService:
             record.user_modified_at = datetime.utcnow()
             record.modification_note = corr.get("note")
 
-        await db.commit()
         return session
 
     async def approve(
@@ -126,7 +125,7 @@ class HITLService:
             if record.final_calories is None:
                 record.final_calories = record.ai_calories
 
-        await db.commit()
+        await db.flush()
         await db.refresh(session)
         return session
 
@@ -142,7 +141,7 @@ class HITLService:
             feedback_type=feedback_type,
         )
         db.add(feedback)
-        await db.commit()
+        await db.flush()
         return feedback
 
     async def _get_session(self, db: AsyncSession, session_id: uuid.UUID) -> AnalysisSession:
