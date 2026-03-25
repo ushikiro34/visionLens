@@ -47,8 +47,8 @@ class HybridFoodSearch:
             )
         return self._collection
 
-    def _get_bm25(self) -> BM25Okapi:
-        """BM25 인덱스 초기화 (최초 1회)"""
+    def _get_bm25(self) -> Optional[BM25Okapi]:
+        """BM25 인덱스 초기화 (최초 1회). 코퍼스가 비어있으면 None 반환."""
         if self._bm25 is None:
             collection = self._get_collection()
             results = collection.get(include=["documents", "metadatas"])
@@ -60,6 +60,8 @@ class HybridFoodSearch:
                 }
                 for doc, meta in zip(results["documents"], results["metadatas"])
             ]
+            if not self._corpus:
+                return None
             tokenized = [item["text"].split() for item in self._corpus]
             self._bm25 = BM25Okapi(tokenized)
         return self._bm25
@@ -75,9 +77,12 @@ class HybridFoodSearch:
         collection = self._get_collection()
         bm25 = self._get_bm25()
 
-        # BM25 검색
-        bm25_scores = bm25.get_scores(query.split())
-        bm25_top_idx = sorted(range(len(bm25_scores)), key=lambda i: bm25_scores[i], reverse=True)[:top_k * 2]
+        # BM25 검색 (코퍼스가 비어있으면 건너뜀)
+        if bm25 is not None:
+            bm25_scores = bm25.get_scores(query.split())
+            bm25_top_idx = sorted(range(len(bm25_scores)), key=lambda i: bm25_scores[i], reverse=True)[:top_k * 2]
+        else:
+            bm25_top_idx = []
 
         # Vector 검색
         vector_results = collection.query(
