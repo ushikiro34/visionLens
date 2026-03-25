@@ -81,7 +81,7 @@ class NutrientCacheManager:
     async def _get_version(self) -> str:
         v = await self.redis.get(DB_VERSION_KEY)
         if v:
-            return v if isinstance(v, str) else v.decode()
+            return v  # decode_responses=True이므로 항상 str
         current = _current_quarter()
         await self.redis.set(DB_VERSION_KEY, current)
         return current
