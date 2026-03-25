@@ -71,12 +71,14 @@ class NutrientCacheManager:
         CI/CD 파이프라인에서 분기 시작일 자동 실행 권장
         """
         old_version = await self._get_version()
-        deleted = 0
-        async for key in self.redis.scan_iter(f"nutrient:*:{old_version}"):
-            await self.redis.delete(key)
-            deleted += 1
+        keys = [key async for key in self.redis.scan_iter(f"nutrient:*:{old_version}")]
+        if keys:
+            pipe = self.redis.pipeline()
+            for key in keys:
+                pipe.delete(key)
+            await pipe.execute()
         await self.redis.set(DB_VERSION_KEY, new_version)
-        return deleted
+        return len(keys)
 
     async def _get_version(self) -> str:
         v = await self.redis.get(DB_VERSION_KEY)
