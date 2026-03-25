@@ -1,21 +1,21 @@
 """
 하이브리드 RAG 검색 서비스
 - BM25(키워드 30%) + Vector 유사도(70%) 병합 (Reciprocal Rank Fusion)
-- 임계값: 0.78 (기존 0.92에서 하향 조정 — 과도한 HITL 트리거 방지)
+- confidence: 최상위 결과의 vector_similarity (cosine, 0~1 스케일) 사용
+  → RRF combined_score는 순위 결정용, threshold 비교는 vector_similarity로 수행
 - "김치찌개" / "김치 찌개" / "김칫국" 혼동 방지
 """
 from dataclasses import dataclass
 from typing import Optional
 from rank_bm25 import BM25Okapi
 import chromadb
-from chromadb.config import Settings as ChromaSettings
 from app.core.config import get_settings
 
 settings = get_settings()
 
 BM25_WEIGHT = 0.3
 VECTOR_WEIGHT = 0.7
-SIMILARITY_THRESHOLD = settings.RAG_SIMILARITY_THRESHOLD  # 0.78
+SIMILARITY_THRESHOLD = settings.RAG_SIMILARITY_THRESHOLD  # 0.78 (cosine similarity 기준)
 
 
 @dataclass
@@ -88,24 +88,24 @@ class HybridFoodSearch:
 
         # RRF 병합
         combined = self._rrf_merge(
-            bm25_top_idx, bm25_scores,
+            bm25_top_idx,
             vector_results, top_k * 2
         )
 
         top_results = combined[:top_k]
-        top_score = top_results[0]["combined_score"] if top_results else 0.0
+        # threshold 비교는 RRF combined_score가 아닌 vector_similarity(cosine, 0~1)로 수행
+        top_vector_sim = top_results[0]["vector_similarity"] if top_results else 0.0
 
         return {
             "results": top_results,
-            "needs_hitl": top_score < SIMILARITY_THRESHOLD,
-            "confidence": round(top_score, 4),
+            "needs_hitl": top_vector_sim < SIMILARITY_THRESHOLD,
+            "confidence": round(top_vector_sim, 4),
             "query": query,
         }
 
     def _rrf_merge(
         self,
         bm25_top_idx: list[int],
-        bm25_scores: list[float],
         vector_results: dict,
         top_k: int,
         k: int = 60,
