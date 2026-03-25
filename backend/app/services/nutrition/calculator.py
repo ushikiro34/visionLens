@@ -5,9 +5,11 @@
 - 모든 계산 결과에 출처·버전·신뢰도 포함
 """
 from dataclasses import dataclass
-from typing import Optional
+from app.core.config import get_settings
 from app.data.density_table import get_density
 from app.data.composite_foods import get_composite, is_composite
+
+settings = get_settings()
 
 
 @dataclass
@@ -95,9 +97,6 @@ class CalorieCalculator:
             sodium_mg=round(mass_g * (nutrient_data.get("sodium_mg") or 0) / 100, 1),
         )
 
-        from app.core.config import get_settings
-        settings = get_settings()
-
         return CalculationResult(
             food_name=food_name,
             mass_g=mass_g,
@@ -146,9 +145,6 @@ class CalorieCalculator:
             energy_kcal=round(total_calories, 1),
             carbs_g=0, protein_g=0, fat_g=0, sodium_mg=0,  # 복합 상세는 추후 확장
         )
-
-        from app.core.config import get_settings
-        settings = get_settings()
 
         return CalculationResult(
             food_name=food_name,
