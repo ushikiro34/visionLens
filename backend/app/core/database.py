@@ -6,11 +6,13 @@ from app.core.config import get_settings
 settings = get_settings()
 
 engine = create_async_engine(
-    settings.DATABASE_URL,
+    settings.get_database_url(),
     echo=settings.DEBUG,
     pool_pre_ping=True,
-    pool_size=10,
-    max_overflow=20,
+    # Railway Hobby 플랜 PostgreSQL 커넥션 제한 고려 (max_connections ~25)
+    # 다른 프로젝트와 공유 중이므로 보수적으로 설정
+    pool_size=3,
+    max_overflow=7,
 )
 
 AsyncSessionLocal = async_sessionmaker(

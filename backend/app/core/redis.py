@@ -9,13 +9,21 @@ _pool: ConnectionPool | None = None
 def get_redis_pool() -> ConnectionPool:
     global _pool
     if _pool is None:
-        _pool = ConnectionPool(
-            host=settings.REDIS_HOST,
-            port=settings.REDIS_PORT,
-            db=settings.REDIS_DB,
-            decode_responses=True,
-            max_connections=20,
-        )
+        if settings.REDIS_URL:
+            # Railway: REDIS_URL = redis://default:password@host:port
+            _pool = ConnectionPool.from_url(
+                settings.REDIS_URL,
+                decode_responses=True,
+                max_connections=10,
+            )
+        else:
+            _pool = ConnectionPool(
+                host=settings.REDIS_HOST,
+                port=settings.REDIS_PORT,
+                db=settings.REDIS_DB,
+                decode_responses=True,
+                max_connections=10,
+            )
     return _pool
 
 
