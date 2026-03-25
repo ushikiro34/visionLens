@@ -54,8 +54,9 @@ class HITLService:
                 ai_calories=calc.calories,
                 ai_confidence=calc.confidence,
                 rag_similarity=calc.confidence,
-                nutrient_detail={"breakdown": calc.breakdown} if calc.is_composite else None,
+                nutrient_detail=None,
                 is_composite=calc.is_composite,
+                composite_breakdown=calc.breakdown if calc.is_composite else None,
             )
             db.add(record)
 
