@@ -20,4 +20,5 @@ RUN mkdir -p models
 
 EXPOSE 8000
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+# Railway는 PORT 환경변수를 주입함. --reload는 프로덕션에서 제거.
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
