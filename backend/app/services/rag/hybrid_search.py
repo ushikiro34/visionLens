@@ -5,7 +5,9 @@
   → RRF combined_score는 순위 결정용, threshold 비교는 vector_similarity로 수행
 - "김치찌개" / "김치 찌개" / "김칫국" 혼동 방지
 """
+import asyncio
 from dataclasses import dataclass
+from functools import partial
 from typing import Optional
 from rank_bm25 import BM25Okapi
 import chromadb
@@ -74,8 +76,11 @@ class HybridFoodSearch:
             needs_hitl: 임계값 미달 여부
             confidence: 최상위 결과 점수
         """
-        collection = self._get_collection()
-        bm25 = self._get_bm25()
+        loop = asyncio.get_event_loop()
+
+        # 동기 ChromaDB 호출 → executor로 이벤트 루프 블로킹 방지
+        collection = await loop.run_in_executor(None, self._get_collection)
+        bm25 = await loop.run_in_executor(None, self._get_bm25)
 
         # BM25 검색 (코퍼스가 비어있으면 건너뜀)
         if bm25 is not None:
@@ -84,11 +89,16 @@ class HybridFoodSearch:
         else:
             bm25_top_idx = []
 
-        # Vector 검색
-        vector_results = collection.query(
-            query_texts=[query],
-            n_results=min(top_k * 2, collection.count() or 1),
-            include=["documents", "metadatas", "distances"],
+        # Vector 검색 (블로킹 I/O → executor)
+        n_results = min(top_k * 2, await loop.run_in_executor(None, collection.count) or 1)
+        vector_results = await loop.run_in_executor(
+            None,
+            partial(
+                collection.query,
+                query_texts=[query],
+                n_results=n_results,
+                include=["documents", "metadatas", "distances"],
+            ),
         )
 
         # RRF 병합
