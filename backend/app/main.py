@@ -51,14 +51,18 @@ app.include_router(analysis.router)
 app.include_router(nutrient.router)
 
 
-# 전역 예외 핸들러 — CORS 헤더가 없는 500 응답 방지
+# 전역 예외 핸들러 — Railway CDN이 5xx 응답에서 CORS 헤더를 제거하므로 직접 주입
 @app.exception_handler(Exception)
-async def unhandled_exception_handler(request: Request, exc: Exception):
+async def unhandled_exception_handler(_request: Request, exc: Exception):
     logger.error("Unhandled exception: %s\n%s", exc, traceback.format_exc())
-    return JSONResponse(
+    response = JSONResponse(
         status_code=500,
         content={"detail": f"서버 오류: {type(exc).__name__}: {exc}"},
     )
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT"
+    response.headers["Access-Control-Allow-Headers"] = "*"
+    return response
 
 
 @app.get("/health")
