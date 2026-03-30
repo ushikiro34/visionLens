@@ -38,10 +38,16 @@ class HybridFoodSearch:
 
     def _get_collection(self):
         if self._chroma_client is None:
-            self._chroma_client = chromadb.HttpClient(
-                host=settings.CHROMA_HOST,
-                port=settings.CHROMA_PORT,
-            )
+            # CHROMA_HOST가 기본값(localhost/chromadb)이면 인메모리 모드 사용
+            # 외부 서버가 없어도 동작 — 재시작 시 데이터 초기화
+            default_hosts = {"localhost", "chromadb", "127.0.0.1"}
+            if settings.CHROMA_HOST in default_hosts:
+                self._chroma_client = chromadb.EphemeralClient()
+            else:
+                self._chroma_client = chromadb.HttpClient(
+                    host=settings.CHROMA_HOST,
+                    port=settings.CHROMA_PORT,
+                )
         if self._collection is None:
             self._collection = self._chroma_client.get_or_create_collection(
                 name=settings.CHROMA_COLLECTION,
@@ -90,7 +96,12 @@ class HybridFoodSearch:
             bm25_top_idx = []
 
         # Vector 검색 (블로킹 I/O → executor)
-        n_results = min(top_k * 2, await loop.run_in_executor(None, collection.count) or 1)
+        count = await loop.run_in_executor(None, collection.count)
+        if count == 0:
+            # 빈 컬렉션 — HITL 트리거, 결과 없음
+            return {"results": [], "needs_hitl": True, "confidence": 0.0, "query": query}
+
+        n_results = min(top_k * 2, count)
         vector_results = await loop.run_in_executor(
             None,
             partial(
