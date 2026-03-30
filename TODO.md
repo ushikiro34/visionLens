@@ -49,7 +49,8 @@
 
 ### 🟢 이후 (서비스 완성)
 
-- [ ] 프론트엔드 개발 (ui_ux_design.md 기반, 현재 백엔드만 존재)
+- [x] 프론트엔드 개발 — Next.js 15 + Tailwind 웹앱 (홈, 분석결과, HITL 승인 플로우)
+- [ ] Vercel 배포 — NEXT_PUBLIC_API_URL 환경변수 설정
 - [ ] YOLO 모델 파인튜닝 (YOLO_FineTune_Guide.md 참조)
 - [ ] 식약처 영양소 데이터 ChromaDB 초기 적재 스크립트 작성
 - [ ] 로깅 / 모니터링 설정 (Railway Metrics 또는 외부 서비스)
