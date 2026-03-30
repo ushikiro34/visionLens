@@ -22,6 +22,7 @@
 - [x] Railway 배포 성공 (visionLens Online)
 - [x] Railway Variables — `DATABASE_URL` / `REDIS_URL` 연결 확인 완료
 - [x] 식약처 API 엔드포인트 변경 (I2790 → apis.data.go.kr/FoodNtrCpntDbInfo02)
+- [x] 식약처 API XML 파싱 전환 및 AMT_NUM 필드 매핑 수정 (김치전 테스트 완료)
 
 ---
 
