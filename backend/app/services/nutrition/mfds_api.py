@@ -1,7 +1,7 @@
 """
 식약처 식품영양성분DB API 클라이언트
-- 서비스 ID: I2790
-- 일 1,000회 기본 제한 → 반드시 캐시 레이어와 함께 사용
+- 엔드포인트: https://apis.data.go.kr/1471000/FoodNtrCpntDbInfo02/getFoodNtrCpntDbInq02
+- 일 10,000회 제한 → 반드시 캐시 레이어와 함께 사용
 - API 키는 환경변수로만 관리 (클라이언트 노출 금지)
 """
 import httpx
@@ -26,31 +26,38 @@ class MFDSApiClient:
     ) -> list[dict]:
         """
         음식명으로 식약처 DB 검색
-        반환: 매칭된 식품 리스트 (100g당 영양 정보 포함)
+        반환: 매칭된 식품 리스트 (영양 정보 포함)
         """
         if not self.api_key:
             raise MFDSApiError("식약처 API 키가 설정되지 않았습니다. MFDS_API_KEY 환경변수를 확인하세요.")
 
-        start = (page - 1) * page_size + 1
-        end = page * page_size
-        url = f"{self.base_url}/{self.api_key}/{self.service_id}/json/{start}/{end}"
-        params = {"DESC_KOR": food_name}
+        url = f"{self.base_url}/{self.service_id}"
+        params = {
+            "serviceKey": self.api_key,
+            "pageNo": page,
+            "numOfRows": page_size,
+            "type": "json",
+            "FOOD_NM_KR": food_name,
+        }
 
-        async with httpx.AsyncClient(timeout=5.0) as client:
+        async with httpx.AsyncClient(timeout=10.0) as client:
             try:
                 response = await client.get(url, params=params)
                 response.raise_for_status()
                 data = response.json()
 
-                rows = (
-                    data.get(self.service_id, {}).get("row", [])
-                    if data.get(self.service_id)
-                    else []
-                )
-                return [self._normalize(row) for row in rows]
+                # 응답 구조: {"response": {"header": {...}, "body": {"items": [...]}}}
+                body = data.get("response", {}).get("body", {})
+                items = body.get("items", [])
+
+                # items가 dict로 올 때 (단일 결과) 리스트로 정규화
+                if isinstance(items, dict):
+                    items = [items]
+
+                return [self._normalize(item) for item in items if item]
 
             except httpx.TimeoutException:
-                raise MFDSApiError("식약처 API 타임아웃 (5초)")
+                raise MFDSApiError("식약처 API 타임아웃 (10초)")
             except httpx.HTTPStatusError as e:
                 raise MFDSApiError(f"식약처 API HTTP 오류: {e.response.status_code}")
             except Exception as e:
@@ -64,15 +71,16 @@ class MFDSApiClient:
     def _normalize(self, row: dict) -> dict:
         """API 반환 필드를 내부 표준 형식으로 변환"""
         return {
-            "food_name":    row.get("DESC_KOR", ""),
-            "serving_size": self._to_float(row.get("SERVING_SIZE")),
+            "food_name":    row.get("FOOD_NM_KR", ""),
+            "serving_size": self._to_float(row.get("SERVING_WT")),
             "energy_kcal":  self._to_float(row.get("ENERGY")),
-            "carbs_g":      self._to_float(row.get("NUTR_CONT1")),
-            "protein_g":    self._to_float(row.get("NUTR_CONT2")),
-            "fat_g":        self._to_float(row.get("NUTR_CONT3")),
-            "sugar_g":      self._to_float(row.get("NUTR_CONT4")),
-            "sodium_mg":    self._to_float(row.get("NUTR_CONT5")),
-            "data_year":    row.get("BGN_YEAR", ""),
+            "carbs_g":      self._to_float(row.get("CARBOHYDRATE")),
+            "protein_g":    self._to_float(row.get("PROTEIN")),
+            "fat_g":        self._to_float(row.get("FAT")),
+            "sugar_g":      self._to_float(row.get("SUGAR")),
+            "sodium_mg":    self._to_float(row.get("SODIUM")),
+            "maker_name":   row.get("MAKER_NM", ""),
+            "data_year":    row.get("RESEARCH_YEAR", ""),
             "raw":          row,   # 원본 보존
         }
 

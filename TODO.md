@@ -1,6 +1,6 @@
 # K-Food Vision Lens — TODO
 
-> 마지막 업데이트: 2026-03-25
+> 마지막 업데이트: 2026-03-30
 
 ## 완료된 작업
 
@@ -20,6 +20,8 @@
 - [x] Dockerfile 프로덕션 설정 수정 (--reload 제거, PORT 환경변수)
 - [x] Dockerfile apt 패키지 오류 수정 (libgl1-mesa-glx → libgl1)
 - [x] Railway 배포 성공 (visionLens Online)
+- [x] Railway Variables — `DATABASE_URL` / `REDIS_URL` 연결 확인 완료
+- [x] 식약처 API 엔드포인트 변경 (I2790 → apis.data.go.kr/FoodNtrCpntDbInfo02)
 
 ---
 
@@ -27,7 +29,6 @@
 
 ### 🔴 즉시 (배포 정상화)
 
-- [ ] Railway Variables — `REDIS_URL` reference variable 연결 확인
 - [ ] Railway Variables — `MFDS_API_KEY` 실제 값 입력
 - [ ] 배포 URL로 `GET /health` 및 `GET /docs` 접속 확인
 - [ ] DB 테이블 자동 생성 확인 (lifespan create_tables 실행 여부)

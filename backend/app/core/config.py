@@ -38,10 +38,10 @@ class Settings(BaseSettings):
     REDIS_PORT: int = 6379
     REDIS_DB: int = 0
 
-    # 식약처 API
+    # 식약처 API (공공데이터포털 — apis.data.go.kr)
     MFDS_API_KEY: str = ""
-    MFDS_BASE_URL: str = "http://openapi.foodsafetykorea.go.kr/api"
-    MFDS_SERVICE_ID: str = "I2790"
+    MFDS_BASE_URL: str = "https://apis.data.go.kr/1471000/FoodNtrCpntDbInfo02"
+    MFDS_SERVICE_ID: str = "getFoodNtrCpntDbInq02"
 
     # HITL 트리거 임계값
     YOLO_CONFIDENCE_THRESHOLD: float = 0.85
