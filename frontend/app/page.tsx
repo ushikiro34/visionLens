@@ -54,8 +54,7 @@ export default function HomePage() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-[#1A0A0C] mb-1">식사 분석</h1>
-        <p className="text-sm text-[#9E7078]">음식 사진을 보고 칼로리를 분석합니다.</p>
+        <p className="text-base font-bold text-[#1A0A0C]">&#8203;음식사진으로 칼로리 분석합니다.</p>
       </div>
 
       {/* 업로드 영역 */}

@@ -14,21 +14,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ko">
       <body className={`${geist.variable} antialiased min-h-screen bg-[#FDF5F6]`}>
-        <header className="bg-white border-b border-[#F0C4C8] px-4 py-3 flex items-center gap-3">
-          {/* VOcal 통합 로고: 아이콘(VO) + cal 텍스트 = 하나의 워드마크 */}
-          <div className="flex flex-col leading-none gap-0.5">
+        <header className="bg-white border-b border-[#F0C4C8] px-4 py-3 flex items-center justify-center">
+          <div className="flex flex-col items-center leading-none gap-0.5">
             <div className="flex items-center">
-              {/* VO 아이콘 */}
               <svg viewBox="0 0 58 36" width="40" height="25" fill="none">
                 <line x1="4" y1="1" x2="17" y2="35" stroke="#8B2030" strokeWidth="2.4" strokeLinecap="round"/>
                 <line x1="24" y1="1" x2="13" y2="35" stroke="#8B2030" strokeWidth="2.4" strokeLinecap="round"/>
                 <circle cx="44" cy="18" r="13" fill="#FDF5F6" stroke="#8B2030" strokeWidth="2.4"/>
                 <circle cx="44" cy="18" r="7.5" fill="none" stroke="#8B2030" strokeWidth="1.2"/>
               </svg>
-              {/* cal — 아이콘에 바짝 붙여서 하나의 로고처럼 */}
               <span className="font-black text-[#8B2030] text-xl tracking-tight" style={{ marginLeft: 1 }}>cal</span>
             </div>
-            <span className="text-[10px] text-[#9E7078] tracking-wide pl-0.5">보이는 칼로리</span>
+            <span className="text-[10px] text-[#9E7078] tracking-wide">보이는 칼로리</span>
           </div>
         </header>
         <main className="max-w-lg mx-auto px-4 py-6 pb-28">{children}</main>
@@ -65,11 +62,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </div>
 
           {/* 카피라이트 + 면책 */}
-          <div className="border-t border-[#F8ECEE] px-4 py-2 flex flex-col items-center gap-1">
-            <p className="text-[10px] text-[#C4878E] text-center leading-relaxed">
-              식약처 데이터베이스를 참조하여 AI가 추정한 칼로리로,<br/>
-              정확하지 않을 수 있습니다. 재미로 즐겨주세요.
-            </p>
+          <div className="border-t border-[#F8ECEE] px-4 py-2 flex flex-col items-center gap-1 text-center">
+            <div className="flex items-center justify-center gap-1.5">
+              <svg viewBox="0 0 58 36" width="18" height="11" fill="none">
+                <line x1="4" y1="1" x2="17" y2="35" stroke="#D4A8AE" strokeWidth="2.4" strokeLinecap="round"/>
+                <line x1="24" y1="1" x2="13" y2="35" stroke="#D4A8AE" strokeWidth="2.4" strokeLinecap="round"/>
+                <circle cx="44" cy="18" r="13" fill="#FDF5F6" stroke="#D4A8AE" strokeWidth="2.4"/>
+                <circle cx="44" cy="18" r="7.5" fill="none" stroke="#D4A8AE" strokeWidth="1.2"/>
+              </svg>
+              <p className="text-[10px] text-[#C4878E] leading-relaxed">
+                식약처 DB 참조 · 의료적 판단 불가 · 재미로 즐겨주세요.
+              </p>
+            </div>
             <p className="text-[9px] text-[#D4A8AE]">
               © 2026 보이는 칼로리 (VOcal)
             </p>
