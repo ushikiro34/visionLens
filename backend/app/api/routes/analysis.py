@@ -17,7 +17,7 @@ from app.core.redis import get_redis
 from app.core.config import get_settings
 from app.schemas.analysis import (
     AnalysisSessionSchema, FoodResultSchema, NutrientSummarySchema,
-    ApplyCorrectionRequest, ApproveRequest, FeedbackRequest,
+    ApplyCorrectionRequest, ApproveRequest, ApproveWithCorrectionsRequest, FeedbackRequest,
 )
 from app.services.nutrition.mfds_api import MFDSApiClient
 from app.services.nutrition.cache_manager import NutrientCacheManager
@@ -156,14 +156,17 @@ async def apply_correction(
 async def approve_session(
     request: Request,
     session_id: uuid.UUID,
+    body: ApproveWithCorrectionsRequest = None,
     db: AsyncSession = Depends(get_db),
 ):
     """
     최종 승인 — HITL 완료
     이 API 호출 시에만 is_approved=True, 최종 기록 확정
+    body.corrections: [{index, food_name}] 으로 음식명 수정 가능
     """
+    corrections = body.corrections if body else []
     try:
-        session = await request.app.state.hitl_svc.approve(db, session_id)
+        session = await request.app.state.hitl_svc.approve(db, session_id, corrections)
         return {
             "status": "ok",
             "session_id": str(session.id),

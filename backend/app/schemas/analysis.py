@@ -67,6 +67,16 @@ class ApproveRequest(BaseModel):
     session_id: uuid.UUID
 
 
+class FoodNameCorrection(BaseModel):
+    """음식명 수정 항목 (인덱스 기반)"""
+    index: int
+    food_name: str
+
+
+class ApproveWithCorrectionsRequest(BaseModel):
+    corrections: list[FoodNameCorrection] = []
+
+
 # ── 피드백 요청 ───────────────────────────────────────────────────────────────
 class FeedbackRequest(BaseModel):
     session_id: uuid.UUID

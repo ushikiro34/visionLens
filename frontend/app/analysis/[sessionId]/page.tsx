@@ -16,6 +16,7 @@ export default function AnalysisPage({ params }: { params: Promise<{ sessionId: 
   const [approved, setApproved] = useState(false)
   const [feedback, setFeedback] = useState<FeedbackType | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [editedNames, setEditedNames] = useState<Record<number, string>>({})
 
   useEffect(() => {
     const raw = searchParams.get("data")
@@ -38,7 +39,11 @@ export default function AnalysisPage({ params }: { params: Promise<{ sessionId: 
     setApproving(true)
     setError(null)
     try {
-      await approveSession(sessionId)
+      const corrections = Object.entries(editedNames).map(([i, food_name]) => ({
+        index: Number(i),
+        food_name,
+      }))
+      await approveSession(sessionId, corrections)
       setApproved(true)
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "승인 실패")
@@ -211,7 +216,14 @@ export default function AnalysisPage({ params }: { params: Promise<{ sessionId: 
       <div className="mb-4">
         <h2 className="text-sm font-semibold text-[#6B4047] mb-2">검출된 음식 ({session.foods.length}개)</h2>
         {session.foods.map((food, i) => (
-          <FoodCard key={i} food={food} index={i} />
+          <FoodCard
+            key={i}
+            food={food}
+            index={i}
+            editable
+            editedName={editedNames[i]}
+            onNameChange={(name) => setEditedNames((prev) => ({ ...prev, [i]: name }))}
+          />
         ))}
       </div>
 

@@ -55,9 +55,14 @@ export async function analyzeImage(
   return res.json()
 }
 
-export async function approveSession(sessionId: string) {
+export async function approveSession(
+  sessionId: string,
+  corrections: { index: number; food_name: string }[] = [],
+) {
   const res = await fetch(`${BASE}/api/v1/analysis/approve/${sessionId}`, {
     method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ corrections }),
   })
   if (!res.ok) throw new Error("승인 실패")
   return res.json()

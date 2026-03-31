@@ -102,10 +102,12 @@ class HITLService:
         self,
         db: AsyncSession,
         session_id: uuid.UUID,
+        corrections: list = None,
     ) -> AnalysisSession:
         """
         최종 승인 — 이 시점에 is_approved=True로 전환
         HITL 절대 룰: 이 메서드 호출 전까지 절대 최종 기록 저장 안 됨
+        corrections: [{index, food_name}] 형식으로 음식명 수정 가능
         """
         session = await self._get_session(db, session_id)
         session.is_approved = True
@@ -115,11 +117,21 @@ class HITLService:
 
         # 최종값 미설정 레코드에 AI 추정값 기본 복사
         result = await db.execute(
-            select(FoodRecord).where(FoodRecord.session_id == session_id)
+            select(FoodRecord)
+            .where(FoodRecord.session_id == session_id)
+            .order_by(FoodRecord.created_at)
         )
         records = result.scalars().all()
-        for record in records:
-            if record.final_food_name is None:
+
+        # 사용자 음식명 수정 적용 (인덱스 기반)
+        correction_map = {c.index: c.food_name for c in (corrections or [])}
+        for i, record in enumerate(records):
+            if i in correction_map:
+                record.final_food_name = correction_map[i]
+                record.user_modified = True
+                record.user_modified_at = datetime.utcnow()
+                record.modification_note = "사용자 음식명 수정"
+            elif record.final_food_name is None:
                 record.final_food_name = record.ai_food_name
             if record.final_mass_g is None:
                 record.final_mass_g = record.ai_mass_g

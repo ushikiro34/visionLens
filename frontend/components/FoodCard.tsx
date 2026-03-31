@@ -1,25 +1,76 @@
 "use client"
+import { useState, useRef, useEffect } from "react"
 import type { FoodResult } from "@/lib/api"
 import NutrientBar from "./NutrientBar"
 
 interface Props {
   food: FoodResult
   index: number
+  editable?: boolean
+  editedName?: string
+  onNameChange?: (name: string) => void
 }
 
-export default function FoodCard({ food, index }: Props) {
+export default function FoodCard({ food, index, editable, editedName, onNameChange }: Props) {
   const confidencePct = Math.round(food.confidence * 100)
   const needsReview = food.needs_hitl || food.confidence < 0.9
+  const displayName = editedName ?? food.food_name
+
+  const [editing, setEditing] = useState(false)
+  const [inputValue, setInputValue] = useState(displayName)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (editing) inputRef.current?.focus()
+  }, [editing])
+
+  function confirmEdit() {
+    const trimmed = inputValue.trim()
+    if (trimmed && trimmed !== food.food_name) {
+      onNameChange?.(trimmed)
+    } else if (!trimmed) {
+      setInputValue(displayName)
+    }
+    setEditing(false)
+  }
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-[#F0C4C8] p-4 mb-3">
       {/* 헤더 */}
       <div className="flex items-start justify-between mb-3">
-        <div>
+        <div className="flex-1 min-w-0 mr-3">
           <span className="text-xs text-[#9E7078] mb-0.5 block">음식 {index + 1}</span>
-          <h3 className="font-bold text-[#1A0A0C] text-base">{food.food_name}</h3>
+          {editing ? (
+            <input
+              ref={inputRef}
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onBlur={confirmEdit}
+              onKeyDown={(e) => { if (e.key === "Enter") confirmEdit(); if (e.key === "Escape") { setInputValue(displayName); setEditing(false) } }}
+              className="font-bold text-[#1A0A0C] text-base border-b-2 border-[#8B2030] outline-none bg-transparent w-full"
+            />
+          ) : (
+            <div className="flex items-center gap-1.5">
+              <h3 className="font-bold text-[#1A0A0C] text-base truncate">{displayName}</h3>
+              {editedName && editedName !== food.food_name && (
+                <span className="text-[10px] text-[#8B2030] bg-[#FCE8EA] px-1.5 py-0.5 rounded-full shrink-0">수정됨</span>
+              )}
+              {editable && (
+                <button
+                  onClick={() => { setInputValue(displayName); setEditing(true) }}
+                  className="text-[#C4878E] hover:text-[#8B2030] transition-colors shrink-0"
+                  aria-label="음식명 수정"
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="13" height="13">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                  </svg>
+                </button>
+              )}
+            </div>
+          )}
         </div>
-        <div className="text-right">
+        <div className="text-right shrink-0">
           <div className="text-xl font-bold text-[#8B2030]">{Math.round(food.calories)}</div>
           <div className="text-xs text-[#9E7078]">kcal</div>
         </div>
