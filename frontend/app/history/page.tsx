@@ -37,7 +37,6 @@ export default function HistoryPage() {
     <div>
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-[#1A0A0C] mb-1">기록</h1>
-        <p className="text-sm text-[#9E7078]">승인된 식사 기록을 확인합니다.</p>
       </div>
 
       {loading && (

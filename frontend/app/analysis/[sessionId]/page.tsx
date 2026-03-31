@@ -70,8 +70,7 @@ export default function AnalysisPage({ params }: { params: Promise<{ sessionId: 
             <polyline points="20 6 9 17 4 12"/>
           </svg>
         </div>
-        <h2 className="text-xl font-bold text-[#1A0A0C] mb-2">기록 완료!</h2>
-        <p className="text-sm text-[#9E7078] mb-6">식약처 DB 기준으로 최종 저장되었습니다.</p>
+        <h2 className="text-xl font-bold text-[#1A0A0C] mb-6">기록 완료!</h2>
 
         {!feedback ? (
           <div className="bg-white rounded-2xl border border-[#F0C4C8] p-4 mb-6 shadow-sm">
@@ -127,7 +126,7 @@ export default function AnalysisPage({ params }: { params: Promise<{ sessionId: 
           onClick={() => router.push("/")}
           className="w-full py-4 rounded-3xl font-bold text-white bg-[#8B2030] hover:bg-[#6D1826] transition-colors"
         >
-          새 식사 분석하기
+          메인페이지로 이동
         </button>
       </div>
     )
@@ -223,10 +222,10 @@ export default function AnalysisPage({ params }: { params: Promise<{ sessionId: 
               </svg>
               저장 중...
             </span>
-          ) : "이 값으로 저장"}
+          ) : "저장"}
         </button>
         <p className="text-center text-xs text-[#9E7078] mt-2">
-          확인 후 저장해야 최종 기록됩니다 (HITL)
+          저장해야 최종 기록됩니다.
         </p>
       </div>
     </div>

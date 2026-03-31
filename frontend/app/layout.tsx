@@ -65,14 +65,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </div>
 
           {/* 카피라이트 + 면책 */}
-          <div className="border-t border-[#F8ECEE] px-4 py-2 flex flex-col items-center gap-0.5">
+          <div className="border-t border-[#F8ECEE] px-4 py-2 flex flex-col items-center gap-1">
             <p className="text-[10px] text-[#C4878E] text-center leading-relaxed">
-              AI가 추정한 칼로리입니다 — 정확도보다 재미로 즐겨주세요
-              <span className="mx-1.5 opacity-40">·</span>
-              식약처 DB 참조
+              식약처 데이터베이스를 참조하여 AI가 추정한 칼로리로,<br/>
+              정확하지 않을 수 있습니다. 재미로 즐겨주세요.
             </p>
             <p className="text-[9px] text-[#D4A8AE]">
-              © 2026 보이는 칼로리 (VOcal) — AI 추정치, 의료적 판단 불가
+              © 2026 보이는 칼로리 (VOcal)
             </p>
           </div>
         </footer>

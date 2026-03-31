@@ -87,6 +87,7 @@ async def analyze_image(
             fill_ratio_3d=fill_3d,
             bowl_volume_ml=bowl_profile.full_volume_ml,
             size_hint=size_hint,
+            db_version=db_version,
         )
         calc_results.append(calc)
 

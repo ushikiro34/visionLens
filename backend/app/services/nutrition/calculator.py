@@ -50,6 +50,7 @@ class CalorieCalculator:
         fill_ratio_3d: float,
         bowl_volume_ml: int,
         size_hint: str = "중",
+        db_version: str = "",
     ) -> CalculationResult:
         """
         최종 칼로리 계산
@@ -57,7 +58,7 @@ class CalorieCalculator:
         """
         density_entry = get_density(self._get_category(food_name))
         density = density_entry.density
-        db_version = nutrient_data.get("db_version", "unknown")
+        db_version = nutrient_data.get("db_version") or db_version or "식약처DB"
 
         # Mass = Bowl_Full_Volume × 3D_Fill_Ratio × Density
         mass_g = round(bowl_volume_ml * fill_ratio_3d * density, 1)
