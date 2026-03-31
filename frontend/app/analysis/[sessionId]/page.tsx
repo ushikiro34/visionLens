@@ -16,7 +16,7 @@ export default function AnalysisPage({ params }: { params: Promise<{ sessionId: 
   const [approved, setApproved] = useState(false)
   const [feedback, setFeedback] = useState<FeedbackType | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [editedNames, setEditedNames] = useState<Record<number, string>>({})
+  const [editedFoods, setEditedFoods] = useState<Record<number, { name: string; kcal: number | null }>>({})
 
   useEffect(() => {
     const raw = searchParams.get("data")
@@ -29,7 +29,10 @@ export default function AnalysisPage({ params }: { params: Promise<{ sessionId: 
     }
   }, [searchParams])
 
-  const totalCalories = session?.foods.reduce((s, f) => s + f.calories, 0) ?? 0
+  const totalCalories = session?.foods.reduce((s, f, i) => {
+    const kcal = editedFoods[i]?.kcal ?? f.calories
+    return s + kcal
+  }, 0) ?? 0
   const totalCarbs = session?.foods.reduce((s, f) => s + f.nutrients.carbs_g, 0) ?? 0
   const totalProtein = session?.foods.reduce((s, f) => s + f.nutrients.protein_g, 0) ?? 0
   const totalFat = session?.foods.reduce((s, f) => s + f.nutrients.fat_g, 0) ?? 0
@@ -39,9 +42,10 @@ export default function AnalysisPage({ params }: { params: Promise<{ sessionId: 
     setApproving(true)
     setError(null)
     try {
-      const corrections = Object.entries(editedNames).map(([i, food_name]) => ({
+      const corrections = Object.entries(editedFoods).map(([i, ef]) => ({
         index: Number(i),
-        food_name,
+        food_name: ef.name,
+        calories: ef.kcal ?? undefined,
       }))
       await approveSession(sessionId, corrections)
       setApproved(true)
@@ -221,8 +225,8 @@ export default function AnalysisPage({ params }: { params: Promise<{ sessionId: 
             food={food}
             index={i}
             editable
-            editedName={editedNames[i]}
-            onNameChange={(name) => setEditedNames((prev) => ({ ...prev, [i]: name }))}
+            editedFood={editedFoods[i]}
+            onFoodChange={(name, kcal) => setEditedFoods((prev) => ({ ...prev, [i]: { name, kcal } }))}
           />
         ))}
       </div>

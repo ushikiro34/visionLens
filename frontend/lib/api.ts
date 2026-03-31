@@ -57,7 +57,7 @@ export async function analyzeImage(
 
 export async function approveSession(
   sessionId: string,
-  corrections: { index: number; food_name: string }[] = [],
+  corrections: { index: number; food_name: string; calories?: number }[] = [],
 ) {
   const res = await fetch(`${BASE}/api/v1/analysis/approve/${sessionId}`, {
     method: "POST",

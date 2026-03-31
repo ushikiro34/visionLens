@@ -123,14 +123,17 @@ class HITLService:
         )
         records = result.scalars().all()
 
-        # 사용자 음식명 수정 적용 (인덱스 기반)
-        correction_map = {c.index: c.food_name for c in (corrections or [])}
+        # 사용자 음식명/칼로리 수정 적용 (인덱스 기반)
+        correction_map = {c.index: c for c in (corrections or [])}
         for i, record in enumerate(records):
             if i in correction_map:
-                record.final_food_name = correction_map[i]
+                corr = correction_map[i]
+                record.final_food_name = corr.food_name
+                if corr.calories is not None:
+                    record.final_calories = corr.calories
                 record.user_modified = True
                 record.user_modified_at = datetime.utcnow()
-                record.modification_note = "사용자 음식명 수정"
+                record.modification_note = "사용자 음식 종류 수정"
             elif record.final_food_name is None:
                 record.final_food_name = record.ai_food_name
             if record.final_mass_g is None:

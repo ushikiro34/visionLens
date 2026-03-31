@@ -71,6 +71,7 @@ class FoodNameCorrection(BaseModel):
     """음식명 수정 항목 (인덱스 기반)"""
     index: int
     food_name: str
+    calories: Optional[float] = None  # 목록 선택 시 고정값 적용, 직접 입력 시 None
 
 
 class ApproveWithCorrectionsRequest(BaseModel):
