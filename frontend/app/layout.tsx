@@ -40,16 +40,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <span className="text-[10px] font-medium">홈</span>
             </Link>
 
-            <Link href="/" className="flex items-center">
-              <svg viewBox="0 0 58 36" width="28" height="18" fill="none">
-                <line x1="4" y1="1" x2="17" y2="35" stroke="#8B2030" strokeWidth="2.4" strokeLinecap="round"/>
-                <line x1="24" y1="1" x2="13" y2="35" stroke="#8B2030" strokeWidth="2.4" strokeLinecap="round"/>
-                <circle cx="44" cy="18" r="13" fill="#FDF5F6" stroke="#8B2030" strokeWidth="2.4"/>
-                <circle cx="44" cy="18" r="7.5" fill="none" stroke="#8B2030" strokeWidth="1.2"/>
-              </svg>
-              <span className="font-black text-[#8B2030] text-sm tracking-tight" style={{ marginLeft: 1 }}>cal</span>
-            </Link>
-
             <Link href="/history" className="flex flex-col items-center gap-0.5 text-[#9E7078] hover:text-[#8B2030] transition-colors">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="22" height="22">
                 <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
@@ -64,12 +54,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {/* 카피라이트 + 면책 */}
           <div className="border-t border-[#F8ECEE] px-4 py-2 flex flex-col items-center gap-1 text-center">
             <div className="flex items-center justify-center gap-1.5">
-              <svg viewBox="0 0 58 36" width="18" height="11" fill="none">
-                <line x1="4" y1="1" x2="17" y2="35" stroke="#D4A8AE" strokeWidth="2.4" strokeLinecap="round"/>
-                <line x1="24" y1="1" x2="13" y2="35" stroke="#D4A8AE" strokeWidth="2.4" strokeLinecap="round"/>
-                <circle cx="44" cy="18" r="13" fill="#FDF5F6" stroke="#D4A8AE" strokeWidth="2.4"/>
-                <circle cx="44" cy="18" r="7.5" fill="none" stroke="#D4A8AE" strokeWidth="1.2"/>
-              </svg>
+              <Link href="/" className="flex items-center shrink-0">
+                <svg viewBox="0 0 58 36" width="22" height="14" fill="none">
+                  <line x1="4" y1="1" x2="17" y2="35" stroke="#C4878E" strokeWidth="2.4" strokeLinecap="round"/>
+                  <line x1="24" y1="1" x2="13" y2="35" stroke="#C4878E" strokeWidth="2.4" strokeLinecap="round"/>
+                  <circle cx="44" cy="18" r="13" fill="#FDF5F6" stroke="#C4878E" strokeWidth="2.4"/>
+                  <circle cx="44" cy="18" r="7.5" fill="none" stroke="#C4878E" strokeWidth="1.2"/>
+                </svg>
+                <span className="font-black text-[#C4878E] text-xs tracking-tight" style={{ marginLeft: 1 }}>cal</span>
+              </Link>
               <p className="text-[10px] text-[#C4878E] leading-relaxed">
                 식약처 DB 참조 · 의료적 판단 불가 · 재미로 즐겨주세요.
               </p>

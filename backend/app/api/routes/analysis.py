@@ -58,6 +58,7 @@ async def analyze_image(
     mfds_client = MFDSApiClient()
     cache_mgr = NutrientCacheManager(redis, mfds_client)
 
+    db_version = await cache_mgr._get_version()
     calc_results = []
     food_schemas = []
 
@@ -108,7 +109,6 @@ async def analyze_image(
         ))
 
     # 6. 세션 생성 (임시 · 미승인)
-    db_version = await cache_mgr._get_version()
     session = await hitl_svc.create_session(
         db,
         vision_result={
