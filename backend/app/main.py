@@ -8,7 +8,7 @@ from fastapi.responses import JSONResponse
 from app.core.config import get_settings
 from app.core.database import create_tables
 from app.core.redis import close_redis
-from app.api.routes import analysis, nutrient
+from app.api.routes import analysis, nutrient, history
 from app.services.vision.yolo_service import YOLOService
 from app.services.vision.fill_ratio import FillRatioCalculator
 from app.services.rag.hybrid_search import HybridFoodSearch
@@ -49,6 +49,7 @@ app.add_middleware(
 
 app.include_router(analysis.router)
 app.include_router(nutrient.router)
+app.include_router(history.router)
 
 
 # 전역 예외 핸들러 — Railway CDN이 5xx 응답에서 CORS 헤더를 제거하므로 직접 주입

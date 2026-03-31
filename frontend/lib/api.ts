@@ -74,6 +74,47 @@ export async function saveFeedback(
   })
 }
 
+export interface HistoryFood {
+  id: string
+  ai_food_name: string | null
+  final_food_name: string | null
+  ai_calories: number | null
+  final_calories: number | null
+  ai_mass_g: number | null
+  final_mass_g: number | null
+  ai_confidence: number | null
+  user_modified: boolean
+  is_composite: boolean
+  composite_breakdown: { name: string; mass_g: number; calories: number }[] | null
+  nutrient_detail: Record<string, unknown> | null
+}
+
+export interface HistorySession {
+  session_id: string
+  created_at: string
+  approved_at: string | null
+  total_calories: number
+  food_names: string[]
+  food_count: number
+  vessel_type: string | null
+  hitl_triggered: boolean
+  mfds_db_version: string | null
+  yolo_confidence: number | null
+  foods?: HistoryFood[]
+}
+
+export async function getHistory(limit = 20, offset = 0): Promise<{ sessions: HistorySession[]; total: number }> {
+  const res = await fetch(`${BASE}/api/v1/history?limit=${limit}&offset=${offset}`)
+  if (!res.ok) throw new Error("기록 조회 실패")
+  return res.json()
+}
+
+export async function getHistorySession(sessionId: string): Promise<HistorySession> {
+  const res = await fetch(`${BASE}/api/v1/history/${sessionId}`)
+  if (!res.ok) throw new Error("세션 조회 실패")
+  return res.json()
+}
+
 export async function getNutrient(foodName: string) {
   const res = await fetch(`${BASE}/api/v1/nutrient/${encodeURIComponent(foodName)}`)
   return res.json()
