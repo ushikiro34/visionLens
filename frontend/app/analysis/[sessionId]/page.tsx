@@ -147,8 +147,23 @@ export default function AnalysisPage({ params }: { params: Promise<{ sessionId: 
         </span>
       </div>
 
+      {/* 복잡한 사진 안내 배너 */}
+      {session.foods.some((f) => f.food_name === "분석불가") && (
+        <div className="flex items-start gap-2.5 bg-blue-50 border border-blue-200 rounded-2xl px-4 py-3 mb-4">
+          <svg className="text-blue-500 flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="18" height="18">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <div>
+            <p className="text-sm font-semibold text-blue-700">이 사진으로는 분석이 어렵습니다.</p>
+            <p className="text-xs text-blue-600 mt-0.5">메인 음식을 가까이서 단독으로 촬영해주세요.</p>
+          </div>
+        </div>
+      )}
+
       {/* HITL 경고 배너 */}
-      {session.needs_hitl && (
+      {session.needs_hitl && !session.foods.some((f) => f.food_name === "분석불가") && (
         <div className="flex items-start gap-2.5 bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3 mb-4">
           <svg className="text-amber-500 flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="18" height="18">
             <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>

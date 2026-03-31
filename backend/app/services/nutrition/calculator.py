@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from app.core.config import get_settings
 from app.data.density_table import get_density
 from app.data.composite_foods import get_composite, is_composite
+from app.data.soup_calories import get_soup_calories
 
 settings = get_settings()
 
@@ -59,6 +60,14 @@ class CalorieCalculator:
         density_entry = get_density(self._get_category(food_name))
         density = density_entry.density
         db_version = nutrient_data.get("db_version") or db_version or "식약처DB"
+
+        # 국물 음식: 부피 계산 대신 고정 칼로리 테이블 사용
+        soup_data = get_soup_calories(food_name)
+        if soup_data:
+            return self._calculate_soup(
+                food_name, soup_data, nutrient_data,
+                fill_ratio_2d, bowl_volume_ml, rag_confidence,
+            )
 
         # Mass = Bowl_Full_Volume × 3D_Fill_Ratio × Density
         mass_g = round(bowl_volume_ml * fill_ratio_3d * density, 1)
@@ -161,6 +170,43 @@ class CalorieCalculator:
             bowl_volume_ml=bowl_volume_ml,
             density_used=density,
             needs_hitl=True,  # 복합 음식은 항상 HITL 권장
+        )
+
+    def _calculate_soup(
+        self,
+        food_name: str,
+        soup_data: tuple[int, int, str],
+        nutrient_data: dict,
+        fill_ratio_2d: float,
+        bowl_volume_ml: int,
+        rag_confidence: float,
+    ) -> CalculationResult:
+        """국물 음식 고정 칼로리 테이블 기반 계산"""
+        soup_kcal, soup_mass_g, soup_desc = soup_data
+        fill_ratio_3d = min(1.0, soup_mass_g / max(bowl_volume_ml, 1))
+
+        nutrients = NutrientSummary(
+            energy_kcal=float(soup_kcal),
+            carbs_g=round(soup_mass_g * (nutrient_data.get("carbs_g") or 0) / 100, 1),
+            protein_g=round(soup_mass_g * (nutrient_data.get("protein_g") or 0) / 100, 1),
+            fat_g=round(soup_mass_g * (nutrient_data.get("fat_g") or 0) / 100, 1),
+            sodium_mg=round(soup_mass_g * (nutrient_data.get("sodium_mg") or 0) / 100, 1),
+        )
+
+        return CalculationResult(
+            food_name=food_name,
+            mass_g=float(soup_mass_g),
+            calories=float(soup_kcal),
+            nutrients=nutrients,
+            is_composite=False,
+            breakdown=[],
+            source=f"국물 음식 고정 테이블 ({soup_desc})",
+            confidence=rag_confidence,
+            fill_ratio_2d=fill_ratio_2d,
+            fill_ratio_3d=fill_ratio_3d,
+            bowl_volume_ml=bowl_volume_ml,
+            density_used=round(soup_mass_g / max(bowl_volume_ml, 1), 3),
+            needs_hitl=False,
         )
 
     def _get_category(self, food_name: str) -> str:

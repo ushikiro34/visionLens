@@ -186,11 +186,15 @@ class YOLOService:
         img_b64 = base64.b64encode(buf.getvalue()).decode()
 
         prompt = (
-            "이 음식 사진에서 보이는 한국 음식을 모두 식별하세요.\n"
+            "이 음식 사진에서 메인 요리 1가지만 식별하세요.\n"
+            "규칙:\n"
+            "- 반찬(김치, 깍두기, 나물무침, 계란말이 등 작은 찬류)은 무시하세요.\n"
+            "- 메인 요리가 명확하지 않거나 반찬만 보이면 food_name을 '분석불가'로 반환하세요.\n"
+            "- 국물 음식(탕, 찌개, 국, 라면 등)은 정확한 음식명으로 반환하세요.\n"
             "반드시 아래 JSON 배열 형식으로만 응답하세요 (다른 텍스트 없이):\n"
             '[{"food_name": "음식명", "vessel_type": "그릇타입", "fill_ratio": 0.7}]\n'
-            "vessel_type은 공기밥/국그릇/뚝배기/접시 중 하나.\n"
-            '음식을 인식할 수 없으면: [{"food_name": "알수없음", "vessel_type": "접시", "fill_ratio": 0.5}]'
+            "vessel_type은 공기밥/국그릇/뚝배기/양은냄비/접시 중 하나.\n"
+            '분석불가: [{"food_name": "분석불가", "vessel_type": "접시", "fill_ratio": 0.5}]'
         )
 
         try:
@@ -225,11 +229,19 @@ class YOLOService:
             if not foods:
                 raise ValueError("빈 결과")
 
+            # 분석불가 판정
+            is_unanalyzable = any(f.food_name == "분석불가" for f in foods)
+            hitl_reason = (
+                "메인 음식을 가까이서 단독으로 촬영해주세요."
+                if is_unanalyzable
+                else "Claude Vision API 사용 — 기준물체 미검출"
+            )
+
             return VisionResult(
                 foods=foods,
                 scale_factor=None,
                 needs_hitl=True,
-                hitl_reason="Claude Vision API 사용 — 기준물체 미검출",
+                hitl_reason=hitl_reason,
                 image_width=image.shape[1],
                 image_height=image.shape[0],
             )
