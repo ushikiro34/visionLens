@@ -14,29 +14,36 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="ko">
       <body className={`${geist.variable} antialiased min-h-screen bg-[#FDF5F6]`}>
         <header className="bg-white border-b border-[#F0C4C8] px-4 py-3 flex items-center gap-3">
-          {/* 헤더: VO 아이콘 + VOCAL 워드마크 */}
-          <div className="flex items-center gap-2.5">
-            {/* VO 아이콘: 젓가락 V(좌) + 공기 탑뷰 O(우) */}
-            <svg viewBox="0 0 58 36" width="38" height="24" fill="none">
-              {/* 젓가락 왼쪽 (V 좌변) */}
-              <line x1="4" y1="1" x2="17" y2="35" stroke="#8B2030" strokeWidth="2.4" strokeLinecap="round"/>
-              {/* 젓가락 오른쪽 (V 우변), 살짝 교차 */}
-              <line x1="24" y1="1" x2="13" y2="35" stroke="#8B2030" strokeWidth="2.4" strokeLinecap="round"/>
-              {/* 공기 외곽 림 (O) */}
-              <circle cx="44" cy="18" r="13" fill="#FDF5F6" stroke="#8B2030" strokeWidth="2.4"/>
-              {/* 공기 내부 바닥 원 */}
-              <circle cx="44" cy="18" r="7.5" fill="none" stroke="#8B2030" strokeWidth="1.2"/>
-            </svg>
-            {/* VOCAL 워드마크 */}
-            <div className="flex flex-col justify-center leading-tight">
-              <span className="font-black text-[#8B2030] text-xl tracking-widest">VOCAL</span>
-              <span className="text-[10px] text-[#9E7078] tracking-wide">보이는 칼로리</span>
+          {/* VOcal 통합 로고: 아이콘(VO) + cal 텍스트 = 하나의 워드마크 */}
+          <div className="flex flex-col leading-none gap-0.5">
+            <div className="flex items-center">
+              {/* VO 아이콘 */}
+              <svg viewBox="0 0 58 36" width="40" height="25" fill="none">
+                <line x1="4" y1="1" x2="17" y2="35" stroke="#8B2030" strokeWidth="2.4" strokeLinecap="round"/>
+                <line x1="24" y1="1" x2="13" y2="35" stroke="#8B2030" strokeWidth="2.4" strokeLinecap="round"/>
+                <circle cx="44" cy="18" r="13" fill="#FDF5F6" stroke="#8B2030" strokeWidth="2.4"/>
+                <circle cx="44" cy="18" r="7.5" fill="none" stroke="#8B2030" strokeWidth="1.2"/>
+              </svg>
+              {/* cal — 아이콘에 바짝 붙여서 하나의 로고처럼 */}
+              <span className="font-black text-[#8B2030] text-xl tracking-tight" style={{ marginLeft: 1 }}>cal</span>
             </div>
+            <span className="text-[10px] text-[#9E7078] tracking-wide pl-0.5">보이는 칼로리</span>
           </div>
         </header>
-        <main className="max-w-lg mx-auto px-4 py-6">{children}</main>
-        <footer className="border-t border-[#F0C4C8] bg-white mt-8 py-4 px-4 text-center">
-          <p className="text-xs text-[#9E7078]">식약처DB사용</p>
+        <main className="max-w-lg mx-auto px-4 py-6 pb-16">{children}</main>
+        <footer className="fixed bottom-0 left-0 right-0 border-t border-[#F0C4C8] bg-white py-3 px-4 flex items-center justify-between">
+          {/* 좌측: 로고 */}
+          <div className="flex items-center">
+            <svg viewBox="0 0 58 36" width="28" height="18" fill="none">
+              <line x1="4" y1="1" x2="17" y2="35" stroke="#8B2030" strokeWidth="2.4" strokeLinecap="round"/>
+              <line x1="24" y1="1" x2="13" y2="35" stroke="#8B2030" strokeWidth="2.4" strokeLinecap="round"/>
+              <circle cx="44" cy="18" r="13" fill="#FDF5F6" stroke="#8B2030" strokeWidth="2.4"/>
+              <circle cx="44" cy="18" r="7.5" fill="none" stroke="#8B2030" strokeWidth="1.2"/>
+            </svg>
+            <span className="font-black text-[#8B2030] text-sm tracking-tight" style={{ marginLeft: 1 }}>cal</span>
+          </div>
+          {/* 우측: 식약처 표기 */}
+          <span className="text-[10px] text-[#9E7078]">식약처DB사용</span>
         </footer>
       </body>
     </html>
