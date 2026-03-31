@@ -50,8 +50,8 @@ export default function HomePage() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-slate-800 mb-1">식사 분석</h1>
-        <p className="text-sm text-slate-500">음식 사진을 업로드하면 칼로리를 분석합니다</p>
+        <h1 className="text-2xl font-bold text-[#1A0A0C] mb-1">식사 분석</h1>
+        <p className="text-sm text-[#9E7078]">음식 사진을 업로드하면 칼로리를 분석합니다</p>
       </div>
 
       {/* 업로드 영역 */}
@@ -59,16 +59,21 @@ export default function HomePage() {
         onClick={() => inputRef.current?.click()}
         onDrop={onDrop}
         onDragOver={(e) => e.preventDefault()}
-        className="relative border-2 border-dashed border-[#22C55E] rounded-3xl p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-green-50 transition-colors mb-4"
+        className="relative border-2 border-dashed border-[#F0C4C8] rounded-3xl p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-[#FCE8EA] hover:border-[#8B2030] transition-colors mb-4"
         style={{ minHeight: preview ? "auto" : 200 }}
       >
         {preview ? (
           <img src={preview} alt="미리보기" className="rounded-2xl max-h-64 object-contain w-full" />
         ) : (
           <>
-            <span className="text-5xl mb-3">📷</span>
-            <p className="font-semibold text-slate-600">사진을 드래그하거나 클릭해서 업로드</p>
-            <p className="text-sm text-slate-400 mt-1">JPG, PNG 지원</p>
+            <div className="w-14 h-14 rounded-2xl bg-[#FCE8EA] flex items-center justify-center mb-3">
+              <svg className="text-[#8B2030]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="28" height="28">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                <circle cx="12" cy="13" r="4"/>
+              </svg>
+            </div>
+            <p className="font-semibold text-[#1A0A0C]">사진을 드래그하거나 클릭해서 업로드</p>
+            <p className="text-sm text-[#9E7078] mt-1">JPG, PNG 지원</p>
           </>
         )}
         <input
@@ -82,11 +87,11 @@ export default function HomePage() {
 
       {/* 그릇 설정 */}
       {file && (
-        <div className="bg-white rounded-2xl border border-slate-100 p-4 mb-4 shadow-sm">
-          <div className="text-sm font-semibold text-slate-600 mb-3">그릇 설정</div>
+        <div className="bg-white rounded-2xl border border-[#F0C4C8] p-4 mb-4 shadow-sm">
+          <div className="text-sm font-semibold text-[#1A0A0C] mb-3">그릇 설정</div>
 
           <div className="mb-3">
-            <div className="text-xs text-slate-400 mb-1.5">그릇 종류</div>
+            <div className="text-xs text-[#9E7078] mb-1.5">그릇 종류</div>
             <div className="flex flex-wrap gap-2">
               {VESSEL_TYPES.map((v) => (
                 <button
@@ -94,8 +99,8 @@ export default function HomePage() {
                   onClick={() => setVesselType(v)}
                   className={`px-3 py-1.5 rounded-xl text-sm font-medium transition-colors ${
                     vesselType === v
-                      ? "bg-[#22C55E] text-white"
-                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                      ? "bg-[#8B2030] text-white"
+                      : "bg-[#FDF5F6] text-[#6B4047] hover:bg-[#FCE8EA]"
                   }`}
                 >
                   {v}
@@ -105,7 +110,7 @@ export default function HomePage() {
           </div>
 
           <div>
-            <div className="text-xs text-slate-400 mb-1.5">그릇 크기</div>
+            <div className="text-xs text-[#9E7078] mb-1.5">그릇 크기</div>
             <div className="flex gap-2">
               {SIZE_HINTS.map((s) => (
                 <button
@@ -113,8 +118,8 @@ export default function HomePage() {
                   onClick={() => setSizeHint(s)}
                   className={`flex-1 py-1.5 rounded-xl text-sm font-medium transition-colors ${
                     sizeHint === s
-                      ? "bg-[#22C55E] text-white"
-                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                      ? "bg-[#8B2030] text-white"
+                      : "bg-[#FDF5F6] text-[#6B4047] hover:bg-[#FCE8EA]"
                   }`}
                 >
                   {s}
@@ -137,12 +142,12 @@ export default function HomePage() {
         onClick={onAnalyze}
         disabled={!file || loading}
         className="w-full py-4 rounded-3xl font-bold text-white text-base transition-all
-          bg-[#22C55E] hover:bg-[#16A34A] active:scale-95
-          disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed"
+          bg-[#8B2030] hover:bg-[#6D1826] active:scale-95
+          disabled:bg-[#E2D0D2] disabled:text-[#B09498] disabled:cursor-not-allowed"
       >
         {loading ? (
           <span className="flex items-center justify-center gap-2">
-            <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24" fill="none">
+            <svg className="animate-spin" viewBox="0 0 24 24" fill="none" width="20" height="20">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
             </svg>
@@ -151,7 +156,7 @@ export default function HomePage() {
         ) : "분석하기"}
       </button>
 
-      <p className="text-center text-xs text-slate-400 mt-3">
+      <p className="text-center text-xs text-[#9E7078] mt-3">
         AI 분석 결과는 반드시 사용자 확인 후 저장됩니다 (식약처 ±10% 오차)
       </p>
     </div>

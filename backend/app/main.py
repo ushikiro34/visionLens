@@ -34,7 +34,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
-    description="한국 음식 칼로리 분석 API — 식약처 공식 DB 기반 · Human-in-the-Loop",
+    description="보칼(BoCal) API — 찍으면 칼로리가 보인다 · 식약처 공식 DB · Human-in-the-Loop",
     lifespan=lifespan,
 )
 

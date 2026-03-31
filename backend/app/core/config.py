@@ -5,7 +5,7 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     # App
-    APP_NAME: str = "K-Food Vision Lens"
+    APP_NAME: str = "보칼 (BoCal)"
     APP_VERSION: str = "1.0.0"
     DEBUG: bool = False
 
@@ -54,6 +54,9 @@ class Settings(BaseSettings):
 
     # YOLO 모델
     YOLO_MODEL_PATH: str = "models/kfood_yolov8s_seg.pt"
+
+    # Anthropic Claude Vision (YOLO 모델 없을 때 fallback)
+    ANTHROPIC_API_KEY: str = ""
 
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
 

@@ -2,12 +2,18 @@
 YOLOv8-seg 비전 서비스
 - AI Hub 150종 한국 음식 fine-tune 모델 사용
 - 음식 검출 + 세그먼트 마스크 + 기준물체(젓가락/숟가락) scale factor 산출
-- 모델 미존재 시 mock 결과 반환 (개발 환경용)
+- 모델 미존재 시 Claude Vision API로 음식 인식 (ANTHROPIC_API_KEY 필요)
+- API 키 없으면 mock 결과 반환 (개발 환경용)
 """
+import base64
+import io
+import json
+import re
 import numpy as np
 from pathlib import Path
 from dataclasses import dataclass, field
 from typing import Optional
+from PIL import Image
 from app.core.config import get_settings
 
 settings = get_settings()
@@ -67,6 +73,8 @@ class YOLOService:
 
     async def analyze(self, image: np.ndarray) -> VisionResult:
         if self.model is None:
+            if settings.ANTHROPIC_API_KEY:
+                return await self._claude_vision_result(image)
             return self._mock_result(image)
 
         results = self.model(image, verbose=False)[0]
@@ -166,6 +174,68 @@ class YOLOService:
             return True, "기준물체(젓가락/숟가락) 미검출 — 크기 추정 불확실"
 
         return False, ""
+
+    async def _claude_vision_result(self, image: np.ndarray) -> VisionResult:
+        """Claude Vision API로 한국 음식 인식 (YOLO 모델 없을 때 fallback)"""
+        import anthropic
+
+        # numpy → JPEG base64
+        pil_img = Image.fromarray(image)
+        buf = io.BytesIO()
+        pil_img.save(buf, format="JPEG", quality=85)
+        img_b64 = base64.b64encode(buf.getvalue()).decode()
+
+        prompt = (
+            "이 음식 사진에서 보이는 한국 음식을 모두 식별하세요.\n"
+            "반드시 아래 JSON 배열 형식으로만 응답하세요 (다른 텍스트 없이):\n"
+            '[{"food_name": "음식명", "vessel_type": "그릇타입", "fill_ratio": 0.7}]\n'
+            "vessel_type은 공기밥/국그릇/뚝배기/접시 중 하나.\n"
+            '음식을 인식할 수 없으면: [{"food_name": "알수없음", "vessel_type": "접시", "fill_ratio": 0.5}]'
+        )
+
+        try:
+            client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY)
+            message = client.messages.create(
+                model="claude-haiku-4-5-20251001",
+                max_tokens=256,
+                messages=[{
+                    "role": "user",
+                    "content": [
+                        {"type": "image", "source": {"type": "base64", "media_type": "image/jpeg", "data": img_b64}},
+                        {"type": "text", "text": prompt},
+                    ],
+                }],
+            )
+            raw = message.content[0].text.strip()
+            # JSON 배열 추출 (```json ... ``` 래퍼 대응)
+            match = re.search(r"\[.*\]", raw, re.DOTALL)
+            items = json.loads(match.group()) if match else json.loads(raw)
+
+            print(f"[YOLO] Claude Vision API 결과: {items}")
+            foods = [
+                DetectedObject(
+                    food_name=item.get("food_name", "알수없음"),
+                    confidence=0.85,
+                    vessel_type=item.get("vessel_type", "접시"),
+                    fill_ratio_2d=float(item.get("fill_ratio", 0.6)),
+                )
+                for item in items
+                if isinstance(item, dict)
+            ]
+            if not foods:
+                raise ValueError("빈 결과")
+
+            return VisionResult(
+                foods=foods,
+                scale_factor=None,
+                needs_hitl=True,
+                hitl_reason="Claude Vision API 사용 — 기준물체 미검출",
+                image_width=image.shape[1],
+                image_height=image.shape[0],
+            )
+        except Exception as e:
+            print(f"[YOLO] Claude Vision API 오류: {e} → mock 사용")
+            return self._mock_result(image)
 
     def _mock_result(self, image: np.ndarray) -> VisionResult:
         """모델 없는 개발 환경용 mock"""
